@@ -1,24 +1,36 @@
-import logo from './logo.svg';
+import React from 'react';
 import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
+import GeneratorPage from './pages/GeneratorPage';
+import FeaturePage from './pages/FeaturePage';
+import SupportPage from './pages/SupportPage';
+
+const theme = createTheme({
+  typography: {
+      fontFamily: 'Montserrat',
+      textTransform: 'none',
+  },
+});
+
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <ThemeProvider theme={theme}>
+        <Router>
+          <Navbar />
+          <Routes>
+            <Route path='/' exact element={<Home />} />
+            <Route path='/generator' element={<GeneratorPage />} />
+            <Route path='/feature' element={<FeaturePage />} />
+            <Route path='/support' element={<SupportPage />} />
+          </Routes>
+        </Router>
+      </ThemeProvider>
+    </>
   );
 }
 
