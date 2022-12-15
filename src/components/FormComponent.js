@@ -13,6 +13,8 @@ function FormComponent() {
   const STAGES = ['Start', 'Build', 'Test', 'Eject']
   const [stage, setStage] = useState([])
 
+  const [showCard, setShowCard] = useState(false)
+
   const handleRepoType = (event) => {
     setRepoType(event.target.value);
   };
@@ -34,6 +36,7 @@ function FormComponent() {
   };
 
   const showAllValues = () => {
+    setShowCard(true);
     console.log(repoType);
     console.log(projectType);
     console.log(projectName);
@@ -135,6 +138,33 @@ function FormComponent() {
                 <Button onClick={showAllValues} variant='contained' color='success' startIcon={<CreateSharpIcon />}>Generate</Button>
               </Grid>
             </Grid>
+
+            <Grid container justifyContent = 'center'>
+              <Grid item>
+                {
+                  showCard ?
+                    <Card variant='outlined' sx={{
+                      mt: 5,
+                      borderRadius: 5,
+                      bgcolor: '#ffa203',
+                      width: 1,
+                      
+                    }}>
+                      <CardContent>
+                        <Typography> Project Details</Typography>
+                        <br/>
+                        <Typography>Repo type : {repoType}</Typography>
+                        <Typography>Project type : {projectType}</Typography>
+                        <Typography>Project Name : {projectName}</Typography>
+                        <Typography>Project Description: {projectDescription}</Typography>
+                        <Typography>stage : {stage.map((stage) => (<Typography display='inline'>{stage}  </Typography>))}
+                        </Typography>
+                      </CardContent>
+                    </Card> : null
+                }
+              </Grid>
+            </Grid>
+            
 
           </Container>
         </CardContent>
