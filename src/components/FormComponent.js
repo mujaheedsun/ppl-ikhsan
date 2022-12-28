@@ -52,9 +52,9 @@ function FormComponent() {
 
     console.log(JSON.stringify(data));
 
-    // https://mujaheedsun.pythonanywhere.com/projects/
+    // http://localhost:8000/projects/
     
-    fetch('http://localhost:8000/projects/', {
+    fetch('https://mujaheedsun.pythonanywhere.com/projects/', {
       method : 'POST',
       headers : {
         'Content-Type' : 'application/json',
