@@ -2,7 +2,9 @@ import { Button, Card, CardContent, Chip, FormControl, Grid, InputLabel, MenuIte
 import { Box, Container } from '@mui/system';
 import React, { useState } from 'react';
 import CreateSharpIcon from '@mui/icons-material/CreateSharp';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import './FormComponent.css';
+
 
 function FormComponent() {
 
@@ -11,7 +13,7 @@ function FormComponent() {
   const [projectName, setProjectName] = useState('')
   const [projectDescription, setProjectDescription] = useState('')
   const STAGES = ['Start', 'Build', 'Test', 'Eject']
-  const [stage, setStage] = useState([])
+  const [stages, setStages] = useState([])
 
   const [showCard, setShowCard] = useState(false)
 
@@ -31,18 +33,50 @@ function FormComponent() {
     setProjectDescription(event.target.value);
   };
 
-  const handleStage = (event) => {
-    setStage(event.target.value);
+  const handleStages = (event) => {
+    setStages(event.target.value);
   };
 
-  const showAllValues = () => {
+  const generate_file = () => {
     setShowCard(true);
-    console.log(repoType);
-    console.log(projectType);
-    console.log(projectName);
-    console.log(projectDescription);
-    console.log(stage);
-  }
+
+    const element = document.createElement('a');
+    
+    const data = {
+      repoType : repoType,
+      projectType : projectType,
+      projectName : projectName,
+      projectDescription : projectDescription,
+      stages : JSON.stringify(stages)
+    };
+
+    console.log(JSON.stringify(data));
+
+    fetch('http://mujaheedsun.pythonanywhere.com/projects/', {
+      method : 'POST',
+      headers : {
+        'Content-Type' : 'application/json',
+      },
+      body : JSON.stringify(data),
+    })
+    .then((response) => response.text())
+    .then((data) => {
+      console.log(data)
+      
+      const file = new Blob([data], {
+        type: "text/plain;charset=utf-8",
+      });
+      element.href = URL.createObjectURL(file);
+      element.download = "CI/CD File.txt";
+      document.body.appendChild(element);
+      element.click();
+    })
+    .catch((error) => {
+      console.log('Error lagi broo : ', error)
+    })
+      
+    
+  };    
 
   return (
     <>
@@ -112,8 +146,8 @@ function FormComponent() {
                   <InputLabel>Stage(s)</InputLabel>
                   <Select
                     multiple
-                    value={stage}
-                    onChange={handleStage}
+                    value={stages}
+                    onChange={handleStages}
                     input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
                     renderValue={(selected) => (
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
@@ -135,8 +169,21 @@ function FormComponent() {
               </Grid>
 
               <Grid item>
-                <Button onClick={showAllValues} variant='contained' color='success' startIcon={<CreateSharpIcon />}>Generate</Button>
+                
+                <Button onClick={generate_file} variant='contained' color='success' startIcon={<CreateSharpIcon />}>Generate</Button>
+                
+                
               </Grid>
+
+              {/* <Grid item>
+                <button onClick={send_object} variant='contained'  startIcon={<FileDownloadIcon />}>Download</button>
+                <a href={send_object}
+                download='text_file.txt'
+                rel='noopener noreferrer'>
+                  Download Ci/CD File
+                </a>
+              </Grid> */}
+
             </Grid>
 
             <Grid container justifyContent = 'center'>
@@ -153,11 +200,11 @@ function FormComponent() {
                       <CardContent>
                         <Typography> Project Details</Typography>
                         <br/>
-                        <Typography>Repo type : {repoType}</Typography>
-                        <Typography>Project type : {projectType}</Typography>
+                        <Typography>Repo Type : {repoType}</Typography>
+                        <Typography>Project Type : {projectType}</Typography>
                         <Typography>Project Name : {projectName}</Typography>
                         <Typography>Project Description: {projectDescription}</Typography>
-                        <Typography>stage : {stage.map((stage) => (<Typography display='inline'>{stage}  </Typography>))}
+                        <Typography>Stage : {stages.map((stage) => (<Typography key={stage} display='inline'>{stage}  </Typography>))}
                         </Typography>
                       </CardContent>
                     </Card> : null
