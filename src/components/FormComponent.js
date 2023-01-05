@@ -2,7 +2,6 @@ import { Button, Card, CardContent, Chip, FormControl, Grid, InputLabel, MenuIte
 import { Box, Container } from '@mui/system';
 import React, { useState } from 'react';
 import CreateSharpIcon from '@mui/icons-material/CreateSharp';
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import './FormComponent.css';
 
 
@@ -12,7 +11,7 @@ function FormComponent() {
   const [projectType, setProjectType] = useState('')
   const [projectName, setProjectName] = useState('')
   const [projectDescription, setProjectDescription] = useState('')
-  const STAGES = ['Start', 'Build', 'Test', 'Eject']
+  const STAGES = ['Start', 'Build', 'Test', 'Deploy']
   const [stages, setStages] = useState([])
 
   const [showCard, setShowCard] = useState(false)
@@ -52,9 +51,9 @@ function FormComponent() {
 
     console.log(JSON.stringify(data));
 
-    // http://localhost:8000/projects/
+    // https://mujaheedsun.pythonanywhere.com/projects/
     
-    fetch('https://mujaheedsun.pythonanywhere.com/projects/', {
+    fetch('http://localhost:8000/projects/', {
       method : 'POST',
       headers : {
         'Content-Type' : 'application/json',
@@ -66,10 +65,10 @@ function FormComponent() {
       console.log(data)
       
       const file = new Blob([data], {
-        type: "text/plain;charset=utf-8",
+        type: "text/x-yaml;charset=utf-8",
       });
       element.href = URL.createObjectURL(file);
-      element.download = "CI/CD File.txt";
+      element.download = "gitlab-ci.yml";
       document.body.appendChild(element);
       element.click();
     })
@@ -84,8 +83,11 @@ function FormComponent() {
     <>
       <Card elevation={0}>
         <CardContent style={{ backgroundColor: `#FE9433` }}>
-          <Typography align='center' variant='h3' sx={{mb:10}}>
+          <Typography align='center' variant='h3'>
             Project Details
+          </Typography>
+          <Typography align='center' variant='h5' sx={{ mb: 10 }}>
+            Yang support baru Gitlab hehe
           </Typography>
 
           <Container>
