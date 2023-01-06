@@ -1,16 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { AppBar, Button, Tab, Tabs, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
+import React from 'react';
+import { AppBar, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
 import TextSnippetRoundedIcon from '@mui/icons-material/TextSnippetRounded';
 import DrawerComponent from './DrawerComponent';
 import './Navbar.css';
 import { Link } from 'react-router-dom';
 
 
-const PAGES = ['Feature', 'Support']
-
 function Navbar() {
 
-  const [value, setValue] = useState();
   const theme = useTheme();
   const isMatch = useMediaQuery(theme.breakpoints.down('md'));
  
@@ -38,19 +35,11 @@ function Navbar() {
                   </li>
                   
                   <li className='nav-item'>
-                    <Link to='/feature' className='nav-links'>
-                      Feature
-                    </Link>
-                  </li>
-                  <li className='nav-item'>
-                    <Link to='/support' className='nav-links'>
-                      Support
+                    <Link to='/about-us' className='nav-links'>
+                      About Us
                     </Link>
                   </li>
                 </ul>
-
-              <Button sx={{ marginLeft: 'auto', marginRight: '10px' }} variant='contained'> Sign In </Button>
-              <Button variant='outlined'> Sign Up </Button>
             </>
           ) }
           

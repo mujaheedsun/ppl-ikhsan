@@ -5,8 +5,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import GeneratorPage from './pages/GeneratorPage';
-import FeaturePage from './pages/FeaturePage';
-import SupportPage from './pages/SupportPage';
+import AboutUsPage from './pages/AboutUsPage';  
 
 const theme = createTheme({
   typography: {
@@ -25,8 +24,7 @@ function App() {
           <Routes>
             <Route path='/' exact element={<Home />} />
             <Route path='/generator' element={<GeneratorPage />} />
-            <Route path='/feature' element={<FeaturePage />} />
-            <Route path='/support' element={<SupportPage />} />
+            <Route path='/about-us' element={<AboutUsPage />} />
           </Routes>
         </Router>
       </ThemeProvider>

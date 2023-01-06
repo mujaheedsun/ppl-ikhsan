@@ -1,28 +1,56 @@
 import { Button, Card, CardContent, Chip, FormControl, Grid, InputLabel, MenuItem, OutlinedInput, Select, TextField, Typography } from '@mui/material';
 import { Box, Container } from '@mui/system';
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import CreateSharpIcon from '@mui/icons-material/CreateSharp';
+import DownloadIcon from '@mui/icons-material/Download';
 import './FormComponent.css';
 
 
 function FormComponent() {
 
-  const [repoType, setRepoType] = useState('')
-  const [projectType, setProjectType] = useState('')
-  const [projectName, setProjectName] = useState('')
-  const [projectDescription, setProjectDescription] = useState('')
-  const STAGES = ['Start', 'Build', 'Test', 'Deploy']
-  const [stages, setStages] = useState([])
+  const [repoType, setRepoType] = useState('');
+  const [projectType, setProjectType] = useState('');
+  const [projectName, setProjectName] = useState('');
+  const [projectDescription, setProjectDescription] = useState('');
+  const STAGES = ['Build', 'Test', 'Deploy'];
+  const [stages, setStages] = useState([]);
+  const [update, setUpdate] = useState(false);
+  const fixRepoType = useRef('');
+  const fixProjectType = useRef('');
+  const fixProjectName = useRef('');
+  const fixProjectDescription = useRef('');
+  const fixStages = useRef([]);
 
-  const [showCard, setShowCard] = useState(false)
+  const [openProjectType, setOpenProjectType] = useState(false);
+  const [openStages, setOpenStages] = useState(false);
+
+  const [showCard, setShowCard] = useState(false);
 
   const handleRepoType = (event) => {
     setRepoType(event.target.value);
+
+    if (repoType !== "") {
+      setOpenProjectType(true)
+    } ;
   };
 
   const handleProjectType = (event) => {
     setProjectType(event.target.value);
+
+    if (projectType !== "") {
+      setOpenStages(true);
+    }  
   };
+
+  useEffect(() => {
+    if (repoType !== "") {
+      setOpenProjectType(true)
+    }
+
+    if (projectType !== "") {
+      setOpenStages(true)
+    }
+  }, [repoType, projectType])
 
   const handleProjectName = (event) => {
     setProjectName(event.target.value);
@@ -36,58 +64,78 @@ function FormComponent() {
     setStages(event.target.value);
   };
 
-  const generate_file = () => {
-    setShowCard(true);
+  const show_project_detail = () => {
+  
+    fixRepoType.current = repoType
+    fixProjectType.current = projectType
+    fixProjectName.current = projectName
+    fixProjectDescription.current = projectDescription
+    fixStages.current = stages
 
-    const element = document.createElement('a');
-    
+    setShowCard(true);
+    setUpdate(!update);
+
     const data = {
-      repoType : repoType,
-      projectType : projectType,
-      projectName : projectName,
-      projectDescription : projectDescription,
-      stages : JSON.stringify(stages)
+      repoType: fixRepoType.current,
+      projectType: fixProjectType.current,
+      projectName: fixProjectName.current,
+      projectDescription: fixProjectDescription.current,
+      stages: JSON.stringify(fixStages.current)
     };
 
     console.log(JSON.stringify(data));
+  };
+
+  const download_file = () => {
+    
+    const element = document.createElement('a');
+
+    const data = {
+      repoType: fixRepoType.current,
+      projectType: fixProjectType.current,
+      projectName: fixProjectName.current,
+      projectDescription: fixProjectDescription.current,
+      stages: JSON.stringify(fixStages.current)
+    };
 
     // http://localhost:8000/projects/
-    
+
     fetch('https://mujaheedsun.pythonanywhere.com/projects/', {
-      method : 'POST',
-      headers : {
-        'Content-Type' : 'application/json',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-      body : JSON.stringify(data),
+      body: JSON.stringify(data),
     })
-    .then((response) => response.text())
-    .then((data) => {
-      console.log(data)
-      
-      const file = new Blob([data], {
-        type: "text/x-yaml;charset=utf-8",
-      });
-      element.href = URL.createObjectURL(file);
-      element.download = "gitlab-ci.yml";
-      document.body.appendChild(element);
-      element.click();
-    })
-    .catch((error) => {
-      console.log('Error lagi broo : ', error)
-    })
-      
-    
-  };    
+      .then((response) => response.text())
+      .then((data) => {
+        console.log(data)
+
+        const file = new Blob([data], {
+          type: "text/x-yaml;charset=utf-8",
+        });
+        element.href = URL.createObjectURL(file);
+
+        if (fixRepoType.current === 'Gitlab') {
+          element.download = "gitlab-ci.yml";
+        } else {
+          element.download = "github-workflow.yml";
+        }
+        
+        document.body.appendChild(element);
+        element.click();
+      })
+      .catch((error) => {
+        console.log('Error lagi broo : ', error)
+      })
+  }
 
   return (
     <>
       <Card elevation={0}>
-        <CardContent style={{ backgroundColor: `#FE9433` }}>
-          <Typography align='center' variant='h3'>
+        <CardContent style={{ backgroundColor: `#FE9433`}}>
+          <Typography align='center' variant='h3' sx={{mb:10, mt:2}}>
             Project Details
-          </Typography>
-          <Typography align='center' variant='h5' sx={{ mb: 10 }}>
-            Yang support baru Gitlab hehe
           </Typography>
 
           <Container>
@@ -95,8 +143,8 @@ function FormComponent() {
               <Grid xs={4} item>
                 <Typography variant='h5'> Repository Type </Typography>
               </Grid>
-              <Grid xs={8}item>
-                <FormControl fullWidth>
+              <Grid xs={8} item>
+                <FormControl fullWidth required >
                   <InputLabel>Repo Type</InputLabel>
                   <Select
                     value={repoType}
@@ -105,7 +153,6 @@ function FormComponent() {
                   >
                     <MenuItem value={'Gitlab'}>Gitlab</MenuItem>
                     <MenuItem value={'Github'}>Github</MenuItem>
-                    <MenuItem value={'Bitbucket'}>Bitbucket</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
@@ -114,16 +161,20 @@ function FormComponent() {
                 <Typography variant='h5'> Project Type </Typography>
               </Grid>
               <Grid xs={8} item>
-                <FormControl fullWidth>
+                <FormControl fullWidth required disabled={!openProjectType}>
                   <InputLabel>Project Type</InputLabel>
                   <Select
                     value={projectType}
                     label="Project Type label"
                     onChange={handleProjectType}
                   >
-                    <MenuItem value={'React'}>React</MenuItem>
-                    <MenuItem value={'Django'}>Django</MenuItem>
-                    <MenuItem value={'Springboot'}>Springboot</MenuItem>
+                    <MenuItem value={'React'}>React JS Node</MenuItem>
+                    <MenuItem value={'Django'}>Django Python</MenuItem>
+
+                    { (repoType === 'Gitlab') ? 
+                      <MenuItem value={'Springboot'}>Springboot Maven</MenuItem> : null
+                    }
+                    
                   </Select>
                 </FormControl>
               </Grid>
@@ -146,7 +197,7 @@ function FormComponent() {
                 <Typography variant='h5'> Stage Included </Typography>
               </Grid>
               <Grid xs={8} item>
-                <FormControl fullWidth>
+                <FormControl fullWidth required disabled={!openStages}>
                   <InputLabel>Stage(s)</InputLabel>
                   <Select
                     multiple
@@ -173,10 +224,10 @@ function FormComponent() {
               </Grid>
 
               <Grid item>
-                
-                <Button onClick={generate_file} variant='contained' color='success' startIcon={<CreateSharpIcon />}>Generate</Button>
-                
-                
+
+                <Button onClick={show_project_detail} variant='contained' color='success' startIcon={<CreateSharpIcon />}>Generate</Button>
+
+
               </Grid>
 
               {/* <Grid item>
@@ -190,32 +241,44 @@ function FormComponent() {
 
             </Grid>
 
-            <Grid container justifyContent = 'center'>
-              <Grid item>
-                {
-                  showCard ?
+            <Grid
+            container
+            direction='column'
+            justifyContent='flex-start'
+            alignItems='center'
+            >
+              {
+                showCard ?
+                <>
+                  <Grid item>
                     <Card variant='outlined' sx={{
                       mt: 5,
                       borderRadius: 5,
-                      bgcolor: '#ffa203',
+                      bgcolor: '#0edb0b',
                       width: 1,
-                      
+
                     }}>
                       <CardContent>
                         <Typography> Project Details</Typography>
-                        <br/>
-                        <Typography>Repo Type : {repoType}</Typography>
-                        <Typography>Project Type : {projectType}</Typography>
-                        <Typography>Project Name : {projectName}</Typography>
-                        <Typography>Project Description: {projectDescription}</Typography>
-                        <Typography>Stage : {stages.map((stage) => (<Typography key={stage} display='inline'>{stage}  </Typography>))}
+                        <br />
+                        <Typography>Repo Type : {fixRepoType.current}</Typography>
+                        <Typography>Project Type : {fixProjectType.current}</Typography>
+                        <Typography>Project Name : {fixProjectName.current}</Typography>
+                        <Typography>Project Description: {fixProjectDescription.current}</Typography>
+                        <Typography>Stage : {fixStages.current.map((stage) => (<Typography key={stage} display='inline'>{stage}  </Typography>))}
                         </Typography>
                       </CardContent>
-                    </Card> : null
-                }
-              </Grid>
+                    </Card>
+                  </Grid>
+
+                  <Grid item sx={{mt:2}}>
+                      <Button onClick={download_file} variant='contained' startIcon={<DownloadIcon />}>Download</Button>
+                  </Grid>
+                </> : null
+              }
+              
             </Grid>
-            
+
 
           </Container>
         </CardContent>
